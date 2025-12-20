@@ -2,52 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post 
+class Post extends Model
 {
-    public static function all() {
-        return [
-            [
-                "id" => 1,
-                "slug" => 'belajar-laravel-dasar',
-                "title" => "Belajar laravel dasar",
-                "author" => "Rizky Pratama",
-                "body" => "Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                Earum necessitatibus debitis consectetur nostrum nihil vitae atque asperiores 
-                possimus assumenda ipsam! Explicabo pariatur ab blanditiis architecto tempora 
-                quibusdam aliquam, adipisci consequuntur. Earum fuga quo ducimus id laudantium 
-                ]quibusdam at maxime optio voluptatibus magnam. Quod commodi totam, tempore 
-                suscipit eaque magnam natus."
-            ],
-            [
-                "id" => 2,
-                "slug" => "tutorial-bahasa-inggris",
-                "title" => "Tutorial bahasa inggris",
-                "author" => "Muhammad Ivan Panteleev",
-                "body" => "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Officia rerum iure dolore.
-                Quas corporis pariatur repellat. Vero quasi voluptates optio recusandae ab reprehenderit. Ullam aut sint in
-                hic, eius fuga!"
-            ],
-        ];
+    use HasFactory;
+    protected $fillable = ['title', 'author', 'slug', 'body'];
+
+    protected $with = ['author', 'category'];
+
+    public function author(): BelongsTo 
+    {
+        return $this->belongsTo(User::class);
     }
 
-    public static function find($slug): array
+    public function category(): BelongsTo 
     {
-
-        // callback function
-        // return Arr::first(static::all(), function ($post) use ($slug) {
-        //     return $post['slug'] == $slug;
-        // });
-
-        // arrow function
-        $post = Arr::first(static::all(), fn($post) => $post["slug"] == $slug);
-
-        if (!$post) {
-            abort(404);
-        }
-
-        return $post;
+        return $this->belongsTo(Category::class);
     }
 }
-
