@@ -6,20 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Home</title>
-    @vite(['resources/css/app.css', 'resources/css/app.js'])
+    @vite('resources/css/app.css')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="h-full">
+<body>
     <div class="min-h-full">
-      <x-navbar></x-navbar>
-      <x-header>{{ $title }}</x-header>
-      <main>
-        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {{ $slot }}
-        </div>
-      </main>
+        @if (Route::is('verification.notice'))
+            <main>
+                <div class="min-h-screen flex items-center justify-center px-4 py-6 bg-white">
+                    {{ $slot }}
+                </div>
+            </main>
+        @else
+            <x-navbar></x-navbar>
+            @if (Route::is('posts'))
+                <x-header>{{ $title ?? 'Blog' }}</x-header>
+            @endif
+            <main>
+                <div class="mx-auto px-4 py-6 sm:px-6 lg:px-10 bg-white">
+                    {{ $slot }}
+                </div>
+            </main>
+        @endif
     </div>
+    @include('sweetalert2::index')
+    @include('auth.register')
+    @include('auth.login')
+    <script src="js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
 </body>
 
