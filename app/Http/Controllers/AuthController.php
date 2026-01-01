@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AuthService;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Services\AuthService;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AuthController extends Controller
@@ -22,9 +25,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): RedirectResponse
     {
-        $login = $request->input('email');
-        $password = $request->password;
-        $this->authService->login($login, $password, $request->validated(), (bool) $request->boolean('remember'));
+        $this->authService->login($request->login, $request->password, (bool) $request->boolean('remember'));
         return redirect()->intended(route('home'))->with('success', 'login berhasil');
     }
 
@@ -32,5 +33,35 @@ class AuthController extends Controller
     {
         $this->authService->logout();
         return redirect()->intended(route('home'))->with('success', 'anda telah logout');
+    }
+
+    public function forgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLinkPassword(ForgotPasswordRequest $request)
+    {
+        $email = $request->only('email');
+        $status = $this->authService->sendResetLinkPassword($email);
+
+        return $status === Password::ResetLinkSent
+            ? back()->with(['status' => __($status)])
+            : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function resetPassword($token): View
+    {
+        return view('auth.reset-password', ['token' => $token]);
+    }
+
+    public function setNewPassword(ResetPasswordRequest $request)
+    {
+        $data = $request->only('email', 'password', 'password_confirmation', 'token');
+        $status = $this->authService->setNewPassword($data);
+
+        return $status === Password::PasswordReset
+            ? redirect()->route('home')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 }

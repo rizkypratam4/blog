@@ -6,17 +6,34 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-
+use Laravel\Socialite\Socialite;
 
 // Authentication routes
-Route::post('register', [AuthController::class, 'register'])->name('register');
-Route::post('login', [AuthController::class, 'login'])->middleware('guest')->name('login');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->middleware('guest')->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Email verification route
 Route::get('/email/verify', [VerificationController::class, 'notice'])->middleware('auth')->name('verification.notice');
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->middleware(['auth', 'signed'])->name('verification.verify');
-Route::post('email/resend', [VerificationController::class, 'resend'])->middleware('auth')->name('verification.resend');
+Route::post('/email/resend', [VerificationController::class, 'resend'])->middleware('auth')->name('verification.resend');
+
+// Forgot Password
+Route::get('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password',[AuthController::class, 'sendResetLinkPassword'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'setNewPassword'])->middleware('guest')->name('password.update');
+
+// OAuth Google
+Route::get('/auth/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
+
+Route::get('/auth/callback', function () {
+    $user = Socialite::driver('google')->redirect();
+});
+
+
 
 Route::get('/', function () {
     return view('home', ["title" => "Home Page"]);

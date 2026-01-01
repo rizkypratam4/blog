@@ -1,8 +1,8 @@
 <x-layout>
-    <x-card>
-        @if (session('success'))
+    @if (session('success'))
             <x-alert>{{ session('success') }}</x-alert>
-        @endif
+    @endif
+    <x-card>
         <div class="flex justify-center mb-4">
             @include('components.icons.email-security')
         </div>

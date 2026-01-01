@@ -12,7 +12,7 @@
 
 <body>
     <div class="min-h-full">
-        @if (Route::is('verification.notice'))
+        @if (Route::is(['verification.notice', 'password.request', 'password.reset']))
             <main>
                 <div class="min-h-screen flex items-center justify-center px-4 py-6 bg-white">
                     {{ $slot }}

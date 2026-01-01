@@ -8,7 +8,8 @@ interface UserRepositoryInterface
 {
    public function findById(int $id): ?User;
 
-   public function findByEmail(string $email): ?User;
+   public function findByEmail(string $login, string $field): ?User;
 
    public function create(array $data): User;
+
 }
